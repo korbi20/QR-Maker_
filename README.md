@@ -7,3 +7,5 @@
 1. Type your URL or text
 2. Press Enter to generate
 3. Click the QR code to download as PNG
+
+#### Try it [out](https://korbi20.github.io/QR-Maker_/)!
