@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR-Maker_</title>
+    <!-- Vollständiger CDN Link -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <style>
+        :root {
+            --gunmetal: #323437;
+            --saffron: #e2b714;
+            --dust-grey: #d1d0c5;
+            --dim-grey: #646669;
+        }
+
+        * {
+            box-sizing: border-box;
+            cursor: default;
+        }
+
+        body {
+            background-color: var(--gunmetal);
+            color: var(--dust-grey);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 55px 80px;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        header h1 {
+            font-size: 0.85rem;
+            color: var(--dust-grey);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin: 0;
+        }
+        
+        .accent-color {
+            color: var(--saffron);
+            display: inline-block;
+            width: 8.5px;
+            height: 3.05px;
+            background-color: var(--saffron);
+            margin-left: 2px;
+            vertical-align: baseline;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .input-side {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 50px;
+            min-width: 0;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(to right, transparent 0px, transparent 100px, black 180px);
+            mask-image: linear-gradient(to right, transparent 0px, transparent 100px, black 180px);
+        }
+
+        .input-container {
+            font-size: 3.5rem;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            white-space: nowrap; 
+        }
+
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: text;
+            border: none;
+            outline: none;
+            z-index: 10;
+        }
+
+        #typing-text {
+            white-space: pre;
+            pointer-events: none;
+            color: var(--dim-grey);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 4.5rem;
+            background-color: var(--saffron);
+            margin: 0 2px;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .qr-side {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 50px;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .qr-wrapper:active { transform: scale(0.95); }
+
+        .corners {
+            position: absolute;
+            inset: 0;
+            border: 5px solid var(--saffron);
+            border-radius: 30px;
+            -webkit-mask-image: 
+                linear-gradient(black, black), linear-gradient(black, black),
+                linear-gradient(black, black), linear-gradient(black, black);
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-size: 45px 45px; 
+            -webkit-mask-position: 0 0, 100% 0, 0 100%, 100% 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .qr-icon {
+            width: 200px;
+            height: 200px;
+            fill: var(--dim-grey);
+            opacity: 0.2;
+        }
+
+        /* Styling für das generierte QR Canvas */
+        canvas {
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            width: 210px !important;
+            height: 210px !important;
+            padding: 12px;
+            border-radius: 15px;
+            z-index: 1;
+        }
+
+        canvas.show {
+            opacity: 1;
+        }
+
+        footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 20px;
+            color: var(--dim-grey); 
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--dim-grey); /* Standardfarbe */
+            transition: fill 0.3s ease, transform 0.2s ease;
+        }
+
+        .footer-icon:hover {
+            fill: var(--saffron); /* Monkeytype-Gelb beim Hover */
+            transform: translateY(-2px); /* Kleiner Sprung-Effekt */
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>QR-Maker<span class="accent-color"></span></h1>
+    </header>
+
+    <main>
+        <div class="input-side">
+            <div class="input-container">
+                <input type="text" id="hidden-input" spellcheck="false" autocomplete="off" autofocus>
+                <span id="typing-text"></span>
+                <span class="cursor"></span>
+            </div>
+        </div>
+
+        <div class="qr-side">
+            <div class="qr-wrapper" id="qr-display" title="Enter zum Erstellen • Klick zum Download">
+                <div class="corners"></div>
+                <svg id="placeholder-icon" class="qr-icon" viewBox="0 0 24 24">
+                    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2z"/>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <a href="https://github.com" target="_blank" style="color: var(--dim-grey); cursor: pointer; display: inline-block; transition: color 0.3s;" onmouseover="this.style.color='var(--saffron)'" onmouseout="this.style.color='var(--dim-grey)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+
+    </footer>
+
+    <script>
+        const hiddenInput = document.getElementById('hidden-input');
+        const textDisplay = document.getElementById('typing-text');
+        const placeholderIcon = document.getElementById('placeholder-icon');
+        const qrWrapper = document.getElementById('qr-display');
+        const phrase = "deine URL";
+        
+        let i = 0;
+        let isFirstKey = true;
+        let qrObj = null;
+        let count = 0;
+
+        function type() {
+            if (i < phrase.length) {
+                textDisplay.textContent += phrase.charAt(i);
+                i++;
+                setTimeout(type, 100);
+            }
+        }
+
+        window.onload = () => {
+            type();
+            hiddenInput.focus();
+        };
+
+        document.body.onclick = () => hiddenInput.focus();
+
+        hiddenInput.addEventListener('input', function() {
+            let val = this.value;
+            if (val.length === 0) {
+                textDisplay.style.color = "var(--dim-grey)";
+                textDisplay.textContent = phrase;
+                isFirstKey = true;
+            } else {
+                if (isFirstKey) {
+                    textDisplay.style.color = "var(--dust-grey)";
+                    isFirstKey = false;
+                }
+                textDisplay.textContent = val;
+            }
+        });
+
+        hiddenInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const val = this.value.trim();
+                if (val.length > 0) {
+                    placeholderIcon.style.display = 'none';
+                    
+                    if (!qrObj) {
+                        const canvas = document.createElement('canvas');
+                        qrWrapper.appendChild(canvas);
+                        qrObj = new QRious({
+                            element: canvas,
+                            size: 250,
+                            value: val,
+                            level: 'H',
+                            background: 'transparent', // Kein weißer Kasten
+                            foreground: '#d1d0c5'      // var(--dust-grey)
+                        });
+                    } else {
+                        qrObj.value = val;
+                    }
+
+                    // Nach qrObj.value = val; oder nach dem Append:
+                    setTimeout(() => {
+                        const canvas = qrWrapper.querySelector('canvas');
+                        if (canvas) canvas.classList.add('show');
+                    }, 50); // Kleiner Delay, damit der Browser die Transition erkennt
+
+                    count++;
+                    counterDisplay.textContent = count;
+                }
+            }
+        });
+
+        qrWrapper.onclick = () => {
+            const canvas = qrWrapper.querySelector('canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                // Nutzt die aktuelle Nummer für den Dateinamen
+                link.download = `qr-maker_${count}.png`; 
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        };
+        async function updateVersion() {
+            const versionElement = document.getElementById('version-display');
+            if (!versionElement) return; // Sicherheitshalber, falls das Span fehlt
+            try {
+                // WICHTIG: Ersetze NUTZER/PROJEKT durch deinen echten GitHub-Namen und den Repository-Namen
+                const response = await fetch('https://github.com');
+                if (response.ok) {
+                    const data = await response.json();
+                    versionElement.textContent = data.tag_name;
+                }
+            } catch (e) {
+                versionElement.textContent = 'v1.0.0';
+            }
+        }
+        // Einfach in dein bestehendes window.onload einfügen
+        window.addEventListener('load', updateVersion);
+
+    </script>
+</body>
+</html>
