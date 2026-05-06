@@ -169,11 +169,13 @@
 
         footer {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 20px;
-            color: var(--dim-grey); 
+            align-items: center; /* Vertikal zentrieren */
+            justify-content: center; /* Horizontal zentrieren */
+            gap: 15px; /* Abstand zwischen Icon und Text */
+            color: var(--dim-grey);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding-bottom: 30px;
         }
 
         .footer-links {
@@ -315,7 +317,7 @@
             const versionElement = document.getElementById('version-display');
             if (!versionElement) return; // Sicherheitshalber, falls das Span fehlt
             try {
-                const response = await fetch('https://github.com/korbi20/QR-Maker_');
+                const response = await fetch('https://github.com/korbi20/QR-Maker_/releases/latest');
                 if (response.ok) {
                     const data = await response.json();
                     versionElement.textContent = data.tag_name;
