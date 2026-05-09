@@ -1,6 +1,6 @@
 <img src=".github/assets/QR-Maker_Intro.gif" style="border-radius: 20px;">
 
-#### QR-Maker_A minimalist, local-first QR generator.
+#### QR-Maker_ a minimalist, local-first QR generator.
 
 #### 01. Usage
 

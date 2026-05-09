@@ -154,10 +154,6 @@ export function setupExport(triggerId, modalId, previewId) {
         return;
     }
 
-    console.log(trigger);
-    console.log(modal);
-    console.log(preview);
-
     trigger.addEventListener('click', () => {
 
         modal.style.display = 'flex';

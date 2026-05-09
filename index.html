@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR-Maker_</title>
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <link rel="stylesheet" href="src/slider.css">
     <style>
         :root {
             --bg: #323437;
@@ -246,92 +247,6 @@
             font-family: monospace;
         }
 
-        #size-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            background: transparent;
-            outline: none;
-            flex: 1;
-        }
-
-        #size-slider::-webkit-slider-runnable-track {
-            height: 6px;
-            border-radius: 999px;
-            background: var(--subAlt);
-        }
-
-        #size-slider::-moz-range-track {
-            height: 6px;
-            border-radius: 999px;
-            background: var(--subAlt);
-        }
-
-        #size-slider {
-            background: linear-gradient(
-                to right,
-                var(--main) 0%,
-                var(--main) 50%,
-                var(--subAlt) 50%,
-                var(--subAlt) 100%
-            );
-            border-radius: 999px;
-        }
-
-        #size-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 10px;
-            height: 14px;
-            border-radius: 3px;
-            background: var(--text);
-            border: 1px solid var(--subAlt);
-            cursor: pointer;
-            margin-top: -4px;
-            transition: transform 0.12s ease, background 0.12s ease;
-        }
-        
-        #size-slider::-moz-range-thumb {
-            width: 10px;
-            height: 14px;
-            border-radius: 3px;
-            background: var(--text);
-            border: 1px solid var(--subAlt);
-            cursor: pointer;
-        }
-
-        #size-slider::-webkit-slider-thumb:hover {
-            background: var(--main);
-            transform: scale(1.05);
-        }
-
-        #size-slider:active::-webkit-slider-thumb {
-            transform: scale(1.15);
-        }
-
-        .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .slider-value {
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: var(--text);
-            min-width: 40px;
-            text-align: right;
-            opacity: 0.9;
-        }
-
-        .size-export label {
-            font-size: 0.7rem;
-            color: var(--sub);
-            letter-spacing: 1px;
-            display: block;
-            margin-bottom: 8px;
-        }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         footer {
@@ -366,6 +281,78 @@
             color: var(--sub);
             margin-left: -10px;
         }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            color: var(--sub);
+            transition: all 0.25s ease;
+        }
+
+        .btn-back.hidden {
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+        }
+
+        /* Text ist standardmäßig versteckt */
+        .btn-back-cn {
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateX(6px);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            order: 3;
+        }
+
+        .btn-back svg {
+            order: 2;
+            width: 18px;
+            height: 18px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            border: 1px solid var(--sub);
+            border-radius: 4px;
+            transform: translateX(35px);
+        }
+
+        /* Hover: Icon fährt nach links, Text erscheint */
+        .btn-back:hover {
+            color: var(--main);
+        }
+
+        .btn-back:hover svg {
+            transform: translateX(0px);
+            border-color: var(--main);
+        }
+
+        .btn-back:hover .btn-back-cn {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Click feedback */
+        .btn-back:active {
+            transform: scale(0.96);
+        }
+
+        /* Das Modal-Fenster */
+        #export-modal {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Zustand, wenn es ausgeblendet wird */
+        #export-modal.fade-out {
+            opacity: 0;
+            transform: scale(0.95); /* Leichtes Schrumpfen für mehr "Smoothness" */
+            pointer-events: none;    /* Verhindert Klicks während der Animation */
+        }
+
 
     </style>
 </head>
@@ -418,14 +405,18 @@
             </div>
 
             <div class="modal-right">
-                <div class="export-item" onclick="downloadBase64()">Base64 <span class="shortcut-hint">4</span></div>
+                <div class="export-item" onclick="downloadBase64()">Base64 (Clipboard) <span class="shortcut-hint">4</span></div>
                 <div class="size-export">
-                    <label>Size</label>
+                    <label>Size:</label>
 
                     <div class="slider-row">
                         <input type="range" id="size-slider" min="100" max="1000" value="200">
                         <span class="slider-value" id="size-value">200</span>
                     </div>
+                </div>
+                <div class="btn-back">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+                    <p class="btn-back-cn"> Back</p>
                 </div>
             </div>
 
@@ -450,6 +441,7 @@
         let qrObj = null;
         let count = 0;
         let currentQRValue = '';
+
 
         // Input function
         function type() {
@@ -482,6 +474,7 @@
             }
         });
 
+        
         // QR-Code generate
         hiddenInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -526,6 +519,7 @@
             }
         });
 
+
         // QR-Code rendering
         function rebuildQR(size) {
             const textColor = getComputedStyle(document.documentElement)
@@ -543,6 +537,7 @@
             });
         }
 
+
         // QR-Code Shortcut
         qrWrapper.onclick = async () => {
             const canvas = qrWrapper.querySelector('canvas');
@@ -557,6 +552,7 @@
                 });
             }
         };
+
 
         // Version function
         async function updateVersion() {
@@ -620,6 +616,7 @@
         // Start
         initThemes();
 
+
         // Slider function
         const slider = document.getElementById("size-slider");
         const valueEl = document.getElementById("size-value");
@@ -676,6 +673,29 @@
         slider.addEventListener("input", onInput);
         // init
         render(+slider.value);
+
+
+        // Wartet, bis das HTML komplett geladen ist
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const backBtn = document.querySelector('.btn-back');
+            const modal = document.getElementById('export-modal');
+
+            if (backBtn && modal) {
+                backBtn.addEventListener('click', () => {
+                    // 1. CSS-Klasse für sanftes Ausfaden hinzufügen
+                    modal.classList.add('fade-out');
+
+                    // 2. Erst nach der Animation (z.B. 300ms) das Display auf none setzen
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        modal.classList.remove('fade-out'); // Reset für nächstes Mal
+                    }, 300);
+                });
+            } else {
+                console.error("Button oder Modal wurde nicht im DOM gefunden!");
+            }
+        });
     </script>
     <script type="module">
         import { setupExport } from './src/export.js';
