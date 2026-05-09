@@ -67,3 +67,4 @@ export function setupExport(triggerId, modalId, previewId) {
         if (e.target === modal) modal.style.display = 'none';
     };
 }
+// [ ]: Erstellung von SVG Export, sowie der üperprüfung der besthenden function und verknüpung zu index.html
