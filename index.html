@@ -403,39 +403,39 @@
     </footer>
 
     <div id="export-modal">
-    <div class="modal-content">
+        <div class="modal-content">
 
-        <div class="modal-header">
-        EXPORT OPTIONS
-        </div>
+            <div class="modal-header">
+            EXPORT OPTIONS
+            </div>
 
-        <div class="modal-grid">
+            <div class="modal-grid">
 
-        <div class="modal-left">
-            <div class="export-item" onclick="downloadPNG()">PNG <span class="shortcut-hint">1</span></div>
-            <div class="export-item" onclick="downloadSVG()">SVG <span class="shortcut-hint">2</span></div>
-            <div class="export-item" onclick="downloadJPG()">JPG <span class="shortcut-hint">3</span></div>
-        </div>
+            <div class="modal-left">
+                <div class="export-item" onclick="downloadPNG()">PNG <span class="shortcut-hint">1</span></div>
+                <div class="export-item" onclick="downloadSVG()">SVG <span class="shortcut-hint">2</span></div>
+                <div class="export-item" onclick="downloadJPG()">JPG <span class="shortcut-hint">3</span></div>
+            </div>
 
-        <div class="modal-right">
-            <div class="export-item" onclick="downloadBase64()">Base64 <span class="shortcut-hint">4</span></div>
-            <div class="size-export">
-                <label>Size</label>
+            <div class="modal-right">
+                <div class="export-item" onclick="downloadBase64()">Base64 <span class="shortcut-hint">4</span></div>
+                <div class="size-export">
+                    <label>Size</label>
 
-                <div class="slider-row">
-                    <input type="range" id="size-slider" min="100" max="1000" value="200">
-                    <span class="slider-value" id="size-value">200</span>
+                    <div class="slider-row">
+                        <input type="range" id="size-slider" min="100" max="1000" value="200">
+                        <span class="slider-value" id="size-value">200</span>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            </div>
+
+            <div class="modal-footer">
+                // &nbsp;&nbsp; Ctrl/Cmd + 1-4 for quick export
+            </div>
 
         </div>
-
-        <div class="modal-footer">
-            // &nbsp;&nbsp; Ctrl/Cmd + 1-4 for quick export
-        </div>
-
-    </div>
     </div>
 
     <script>
@@ -449,6 +449,7 @@
         let isFirstKey = true;
         let qrObj = null;
         let count = 0;
+        let currentQRValue = '';
 
         // Input function
         function type() {
@@ -487,6 +488,7 @@
                 const val = this.value.trim();
                 if (val.length > 0) {
                     placeholderIcon.style.display = 'none';
+                    currentQRValue = val;
 
                     // CSS-Variable auslesen, da QRious kein "var()" versteht
                     const textColor = getComputedStyle(document.documentElement)
@@ -523,6 +525,23 @@
                 }
             }
         });
+
+        // QR-Code rendering
+        function rebuildQR(size) {
+            const textColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--text').trim();
+
+            const canvas = qrWrapper.querySelector('canvas');
+            if (!currentQRValue) return;
+
+            if (!canvas) return;
+
+            qrObj.set({
+                value: currentQRValue,
+                size: size,
+                foreground: textColor
+            });
+        }
 
         // QR-Code Shortcut
         qrWrapper.onclick = async () => {
@@ -601,25 +620,6 @@
         // Start
         initThemes();
 
-        // Export function
-        const exportTrigger = document.getElementById('export-trigger');
-        const modal = document.getElementById('export-modal');
-
-        // Modal öffnen
-        exportTrigger.onclick = () => {
-            modal.style.display = 'flex';
-            
-            // Optional: Den aktuellen QR-Code auch im Modal anzeigen
-            const currentCanvas = qrWrapper.querySelector('canvas');
-            const modalPreview = document.getElementById('modal-qr-preview');
-            modalPreview.innerHTML = ''; // Vorherige Vorschau leeren
-            if (currentCanvas) {
-                const clone = currentCanvas.cloneNode(true);
-                clone.style.opacity = "1"; // Sicherstellen, dass er sichtbar ist
-                modalPreview.appendChild(clone);
-            }
-        };
-
         // Slider function
         const slider = document.getElementById("size-slider");
         const valueEl = document.getElementById("size-value");
@@ -663,6 +663,7 @@
                     var(--subAlt) 100%
                 )
             `;
+            rebuildQR(val);
         }
         function onInput(e) {
             let val = +e.target.value;
@@ -675,25 +676,14 @@
         slider.addEventListener("input", onInput);
         // init
         render(+slider.value);
-
-        // Export Shortcuts
-        window.addEventListener('keydown', (e) => {
-            const modal = document.getElementById('export-modal');
-            if (modal.style.display === 'flex') {
-                if (e.key === '1') downloadPNG();
-                if (e.key === '2') downloadSVG();
-                if (e.key === '3') downloadJPG();
-                if (e.key === '4') downloadBase64();
-                if (e.key === 'Escape') modal.style.display = 'none'; // Schließen mit Esc
-            }
-        });
-
     </script>
     <script type="module">
-        import { setupExport } from './src/export.js'; // [ ]: Verknüpfung prüfen
-        
-        // Initialisiert alles: Button-Klicks, Tastenkürzel (via HTML) und Modal
-        setupExport('export-trigger', 'export-modal', 'modal-qr-preview');
+        import { setupExport } from './src/export.js';
+
+        setupExport(
+            'export-trigger',
+            'export-modal',
+        );
     </script>
 
 </body>
