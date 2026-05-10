@@ -3,95 +3,110 @@ const getCanvas = () =>
 
 let exportCount = 0;
 
+function getExportColor() {
+    // Wenn Modus 'dark', dann weißer QR-Code, sonst schwarzer QR-Code
+    return currentMode === 'dark' ? '#ffffff' : '#000000';
+}
+
 function downloadPNG() {
     const canvas = getCanvas();
+    if (!canvas || !qrObj) return;
 
-    if (!canvas) return;
+    // 1. Farbe kurzzeitig für Export ändern
+    const originalColor = qrObj.foreground;
+    qrObj.set({ foreground: getExportColor() });
 
+    // 2. Download ausführen
     const link = document.createElement('a');
-
-    link.download = `qr-maker_${exportCount++}.png`;
+    link.download = `qr-maker_${currentQRValue}.png`;
     link.href = canvas.toDataURL('image/png');
-
     link.click();
+
+    // 3. Farbe zurücksetzen auf Vorschau-Farbe
+    qrObj.set({ foreground: originalColor });
 }
 
 function downloadJPG() {
     const canvas = getCanvas();
+    if (!canvas || !qrObj) return;
 
-    if (!canvas) return;
+    const originalColor = qrObj.foreground;
+    qrObj.set({ foreground: getExportColor() });
 
     const jpgCanvas = document.createElement('canvas');
-
     jpgCanvas.width = canvas.width;
     jpgCanvas.height = canvas.height;
-
     const ctx = jpgCanvas.getContext('2d');
 
-    // JPG braucht Hintergrund
-    ctx.fillStyle = '#ffffff';
+    // JPG Hintergrund: Weiß bei Lightmode, Schwarz bei Darkmode? 
+    // Meistens ist Weiß für QR besser lesbar:
+    ctx.fillStyle = currentMode === 'dark' ? '#000000' : '#ffffff';
     ctx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
 
     ctx.drawImage(canvas, 0, 0);
 
     const link = document.createElement('a');
-
-    link.download = `qr-maker_${exportCount++}.jpg`;
+    link.download = `qr-maker_${currentQRValue}.jpg`;
     link.href = jpgCanvas.toDataURL('image/jpeg', 0.92);
-
     link.click();
+
+    qrObj.set({ foreground: originalColor });
+}
+
+function downloadBase64() {
+    const canvas = getCanvas();
+    if (!canvas || !qrObj) return;
+
+    const originalColor = qrObj.foreground;
+    qrObj.set({ foreground: getExportColor() });
+
+    const base64 = canvas.toDataURL('image/png');
+    navigator.clipboard.writeText(base64);
+    
+    qrObj.set({ foreground: originalColor });
+    alert('Base64 in Dark/Light-Optik kopiert!');
 }
 
 function downloadSVG() {
     const canvas = getCanvas();
+    if (!canvas || !qrObj) return;
 
-    if (!canvas) return;
+    // 1. Farbe für den Export erzwingen (Logik A Status)
+    const originalColor = qrObj.foreground;
+    const exportColor = currentMode === 'dark' ? '#ffffff' : '#000000';
+    qrObj.set({ foreground: exportColor });
 
+    // 2. Jetzt erst den Snapshot für das SVG machen
     const size = canvas.width;
-
     const dataUrl = canvas.toDataURL('image/png');
 
+    // Das SVG-Gerüst bauen
     const svgContent = `
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="${size}"
-     height="${size}">
-    <image
-        href="${dataUrl}"
-        width="${size}"
-        height="${size}" />
+<svg xmlns="http://w3.org" 
+     width="${size}" 
+     height="${size}" 
+     viewBox="0 0 ${size} ${size}">
+    <rect width="100%" height="100%" fill="${currentMode === 'dark' ? '#000000' : 'none'}" />
+    <image href="${dataUrl}" width="${size}" height="${size}" />
 </svg>
 `;
 
     const blob = new Blob(
         [svgContent],
-        {
-            type: 'image/svg+xml;charset=utf-8'
-        }
+        { type: 'image/svg+xml;charset=utf-8' }
     );
 
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement('a');
-
     link.href = url;
-    link.download = `qr-maker_${exportCount++}.svg`;
-
+    link.download = `qr-maker_${currentQRValue}.svg`;
     link.click();
 
+    // 3. Wichtig: UI wieder auf die ursprüngliche Vorschau-Farbe zurücksetzen
     URL.revokeObjectURL(url);
+    qrObj.set({ foreground: originalColor });
 }
 
-function downloadBase64() {
-    const canvas = getCanvas();
-
-    if (!canvas) return;
-
-    const base64 = canvas.toDataURL('image/png');
-
-    navigator.clipboard.writeText(base64);
-
-    console.log('Base64 copied');
-}
 
 function openModal(modal, preview) {
     modal.style.display = 'flex';
@@ -109,34 +124,13 @@ function openModal(modal, preview) {
     }
 }
 
-function setupShortcuts(modal) {
-    window.addEventListener('keydown', (e) => {
-
-        if (modal.style.display !== 'flex') return;
-
-        switch (e.key) {
-
-            case '1':
-                downloadPNG();
-                break;
-
-            case '2':
-                downloadSVG();
-                break;
-
-            case '3':
-                downloadJPG();
-                break;
-
-            case '4':
-                downloadBase64();
-                break;
-
-            case 'Escape':
-                modal.style.display = 'none';
-                break;
-        }
-    });
+function triggerModalClose() {
+    const modal = document.getElementById('export-modal');
+    modal.classList.add('fade-out');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('fade-out');
+    }, 300);
 }
 
 export function setupExport(triggerId, modalId, previewId) {

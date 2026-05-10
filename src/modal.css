@@ -1,0 +1,172 @@
+#export-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgb(from var(--bg) r g b / 0.8); /* Dunklerer Hintergrund */
+    backdrop-filter: blur(2px); /* Der edle Apple-Look */
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background: var(--bg);
+    padding: 28px;
+    border-radius: 16px;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid var(--subAlt);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.modal-header {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--main);
+}
+
+.modal-grid {
+    display: flex;
+    gap: 32px;
+}
+
+.modal-left,
+.modal-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-footer {
+    font-size: 0.7rem;
+    color: var(--sub);
+}
+
+.export-item {
+    padding: 10px 0;
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: color 0.2s;
+}
+
+.export-item:hover {
+    color: var(--main);
+}
+
+.shortcut-hint {
+    font-size: 0.7rem;
+    color: var(--sub);
+    border: 1px solid var(--sub);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+    font-family: monospace;
+}
+.options-export {
+    display: flex;
+    align-items: center;
+    width: 100%;
+        }
+
+.light-dark-export {
+    display: flex; /* Sorgt dafür, dass Sonne & Mond nebeneinander sind */
+    gap: 6px;      /* Kleiner Abstand zwischen den beiden Icons */
+}
+
+.light-dark-export svg {
+    width: 20px;
+    height: 20px;
+    color: var(--sub,);
+    border: 1px solid var(--sub);
+    padding: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease; /* Macht den Wechsel geschmeidig */
+}
+
+/* Der "Hover-Zustand" als feste Klasse */
+.light-dark-export svg.active, 
+.light-dark-export svg:hover {
+    color: var(--main,);
+    border-color: var(--main,);
+}
+
+.btn-back {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--sub);
+    transition: all 0.25s ease;
+}
+
+.btn-back.hidden {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+/* Text ist standardmäßig versteckt */
+.btn-back-cn {
+    font-size: 1rem;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    order: 3;
+}
+
+.btn-back svg {
+    order: 2;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    border: 1px solid var(--sub);
+    border-radius: 4px;
+    transform: translateX(35px);
+}
+
+/* Hover: Icon fährt nach links, Text erscheint */
+.btn-back:hover {
+    color: var(--main);
+}
+
+.btn-back:hover svg {
+    transform: translateX(0px);
+    border-color: var(--main);
+}
+
+.btn-back:hover .btn-back-cn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Click feedback */
+.btn-back:active {
+    transform: scale(0.96);
+}
+
+/* Das Modal-Fenster */
+#export-modal {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Zustand, wenn es ausgeblendet wird */
+#export-modal.fade-out {
+    opacity: 0;
+    transform: scale(0.95); /* Leichtes Schrumpfen für mehr "Smoothness" */
+    pointer-events: none;    /* Verhindert Klicks während der Animation */
+}

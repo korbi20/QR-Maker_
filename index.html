@@ -6,6 +6,8 @@
     <title>QR-Maker_</title>
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <link rel="stylesheet" href="src/slider.css">
+    <link rel="stylesheet" href="src/modal.css">
+    <script src="src/export.js"></script>
     <style>
         :root {
             --bg: #323437;
@@ -174,79 +176,6 @@
             opacity: 1;
         }
 
-        #export-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgb(from var(--bg) r g b / 0.8); /* Dunklerer Hintergrund */
-            backdrop-filter: blur(2px); /* Der edle Apple-Look */
-            -webkit-backdrop-filter: blur(2px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal-content {
-            background: var(--bg);
-            padding: 28px;
-            border-radius: 16px;
-            width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border: 1px solid var(--subAlt);
-            box-shadow: 0 10px 30px rgba(0,0,0,.35);
-        }
-
-        .modal-header {
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            color: var(--main);
-        }
-
-        .modal-grid {
-            display: flex;
-            gap: 32px;
-        }
-
-        .modal-left,
-        .modal-right {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .modal-footer {
-            font-size: 0.7rem;
-            color: var(--sub);
-        }
-
-        .export-item {
-            padding: 10px 0;
-            color: var(--text);
-            font-size: 1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: color 0.2s;
-        }
-
-        .export-item:hover {
-            color: var(--main);
-        }
-
-        .shortcut-hint {
-            font-size: 0.7rem;
-            color: var(--sub);
-            border: 1px solid var(--sub);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: auto;
-            font-family: monospace;
-        }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         footer {
@@ -282,78 +211,9 @@
             margin-left: -10px;
         }
 
-        .btn-back {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 6px;
-            cursor: pointer;
-            user-select: none;
-            color: var(--sub);
-            transition: all 0.25s ease;
+        #version-display {
+            margin-left: -5px;
         }
-
-        .btn-back.hidden {
-            opacity: 0;
-            transform: translateY(-6px);
-            pointer-events: none;
-        }
-
-        /* Text ist standardmäßig versteckt */
-        .btn-back-cn {
-            font-size: 1rem;
-            opacity: 0;
-            transform: translateX(6px);
-            transition: all 0.25s ease;
-            white-space: nowrap;
-            order: 3;
-        }
-
-        .btn-back svg {
-            order: 2;
-            width: 18px;
-            height: 18px;
-            transition: transform 0.25s ease, border-color 0.25s ease;
-            border: 1px solid var(--sub);
-            border-radius: 4px;
-            transform: translateX(35px);
-        }
-
-        /* Hover: Icon fährt nach links, Text erscheint */
-        .btn-back:hover {
-            color: var(--main);
-        }
-
-        .btn-back:hover svg {
-            transform: translateX(0px);
-            border-color: var(--main);
-        }
-
-        .btn-back:hover .btn-back-cn {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Click feedback */
-        .btn-back:active {
-            transform: scale(0.96);
-        }
-
-        /* Das Modal-Fenster */
-        #export-modal {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        /* Zustand, wenn es ausgeblendet wird */
-        #export-modal.fade-out {
-            opacity: 0;
-            transform: scale(0.95); /* Leichtes Schrumpfen für mehr "Smoothness" */
-            pointer-events: none;    /* Verhindert Klicks während der Animation */
-        }
-
-
     </style>
 </head>
 <body>
@@ -382,10 +242,10 @@
     </main>
 
     <footer>
-        <svg id="theme-toggle" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-swatch-book-icon lucide-swatch-book" span="Theme switch"><path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z"/><path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7"/><path d="M 7 17h.01"/><path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8"/></svg>
+        <svg id="theme-toggle" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-swatch-book-icon lucide-swatch-book" span="Theme switch"><title>Theme switch</title><path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z"/><path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7"/><path d="M 7 17h.01"/><path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8"/></svg>
         <div id="theme-name">Loading...</div>
-        <svg id="export-trigger" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-up-icon lucide-file-up"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/></svg>
-        <a href="https://github.com/korbi20/QR-Maker_" target="_blank" style="color: var(--sub); cursor: pointer; display: inline-block; transition: color 0.3s;" onmouseover="this.style.color='var(--main)'" onmouseout="this.style.color='var(--sub)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+        <svg id="export-trigger" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-up-icon lucide-file-up"><title>Export menu</title><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/></svg>
+        <a href="https://github.com/korbi20/QR-Maker_" target="_blank" style="color: var(--sub); cursor: pointer; display: inline-block; transition: color 0.3s;" onmouseover="this.style.color='var(--main)'" onmouseout="this.style.color='var(--sub)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;"><title>Github</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
         <span><span id="version-display">v1.0.0</span>
     </footer>
 
@@ -414,9 +274,15 @@
                         <span class="slider-value" id="size-value">200</span>
                     </div>
                 </div>
-                <div class="btn-back">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
-                    <p class="btn-back-cn"> Back</p>
+                <div class="options-export">
+                    <div class="light-dark-export">
+                        <svg id="sun-btn" class="active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        <svg id="moon-btn" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+                    </div>
+                    <div class="btn-back">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+                        <p class="btn-back-cn"> Back</p>
+                    </div>
                 </div>
             </div>
 
@@ -483,7 +349,7 @@
                     placeholderIcon.style.display = 'none';
                     currentQRValue = val;
 
-                    // CSS-Variable auslesen, da QRious kein "var()" versteht
+                    // CSS-Variable read for dynamic color and size
                     const textColor = getComputedStyle(document.documentElement)
                         .getPropertyValue('--text').trim();
                     const qrSize = parseInt(getComputedStyle(document.documentElement)
@@ -495,14 +361,14 @@
                         qrWrapper.appendChild(canvas);
                         qrObj = new QRious({
                             element: canvas,
-                            size: qrSize || 200, // Fallback auf 200px, falls Variable nicht gesetzt
+                            size: qrSize || 200,
                             value: val,
                             level: 'H',
                             background: 'transparent',
-                            foreground: textColor || 'black' // Fallback auf Schwarz, falls Variable leer
+                            foreground: textColor || 'black'
                         });
                     } else {
-                        // Falls qrObj schon existiert, Farbe und Wert aktualisieren
+                        // If QR already exists, just update the value and color (size is handled by slider)
                         qrObj.set({
                             foreground: textColor,
                             value: val
@@ -545,7 +411,7 @@
                 canvas.toBlob(blob => {
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]);
-                    // Kleiner visueller Feedback-Effekt
+                    // Visuall feedback on click
                     qrWrapper.style.transform = "scale(1.1)";
                     setTimeout(() => qrWrapper.style.transform = "scale(1)", 200);
                     console.log("Copied to clipboard!");
@@ -580,7 +446,7 @@
                 const response = await fetch('src/themes.json');
                 themes = await response.json();
                 
-                // Letztes Theme aus dem Speicher laden oder Index 0
+                // Last used theme index from localStorage, default to 0 if not set
                 currentThemeIndex = parseInt(localStorage.getItem('themeIndex')) || 0;
                 
                 applyTheme(currentThemeIndex);
@@ -593,18 +459,18 @@
             const theme = themes[index];
             if (!theme) return;
 
-            // Alle Farben als CSS-Variablen setzen
+            // All theme properties (except name) are set as CSS variables
             Object.keys(theme).forEach(key => {
                 if (key !== 'name') {
                     document.documentElement.style.setProperty(`--${key}`, theme[key]);
                 }
             });
 
-            // Namen anzeigen
+            // Show current theme name
             const nameDisplay = document.getElementById('theme-name');
             if (nameDisplay) nameDisplay.innerText = theme.name;
 
-            // Wahl optional im Browser speichern
+            // Saving current theme index in localStorage
             localStorage.setItem('themeIndex', index);
         }
 
@@ -612,6 +478,7 @@
             if (themes.length === 0) return;
             currentThemeIndex = (currentThemeIndex + 1) % themes.length;
             applyTheme(currentThemeIndex);
+            rebuildQR(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--qr-size').trim(), 10));
         };
         // Start
         initThemes();
@@ -622,7 +489,7 @@
         const valueEl = document.getElementById("size-value");
 
         const snapPoints = [100, 200, 236, 354, 400, 500, 591, 600, 1000]; // gängige QR-Code Größen (100-2000px)
-        const SNAP_RANGE = 7; // je kleiner, desto weniger "lock"
+        const SNAP_RANGE = 7; // the smaller, the more precise the snapping (in pixels)
 
         function nearestSnap(val) {
             let closest = val;
@@ -675,7 +542,7 @@
         render(+slider.value);
 
 
-        // Wartet, bis das HTML komplett geladen ist
+        // Waiting for DOM to load before adding event listener to Back button
         document.addEventListener('DOMContentLoaded', () => {
             
             const backBtn = document.querySelector('.btn-back');
@@ -683,17 +550,76 @@
 
             if (backBtn && modal) {
                 backBtn.addEventListener('click', () => {
-                    // 1. CSS-Klasse für sanftes Ausfaden hinzufügen
+                    // 1. CSS-Class add for fade-out animation
                     modal.classList.add('fade-out');
 
-                    // 2. Erst nach der Animation (z.B. 300ms) das Display auf none setzen
+                    // 2. After Animation (z.B. 300ms) Display set "none"
                     setTimeout(() => {
                         modal.style.display = 'none';
-                        modal.classList.remove('fade-out'); // Reset für nächstes Mal
+                        modal.classList.remove('fade-out'); // Reset for next open
                     }, 300);
                 });
             } else {
                 console.error("Button oder Modal wurde nicht im DOM gefunden!");
+            }
+        });
+
+        // Light/Dark Mode Toggle at Export Modal
+        const sunBtn = document.getElementById('sun-btn');
+        const moonBtn = document.getElementById('moon-btn');
+
+        // Saving state ("light" oder "dark")
+        let currentMode = 'light'; 
+
+        function toggleTheme(mode) {
+            currentMode = mode;
+
+            // Class exchange
+            if (mode === 'light') {
+                sunBtn.classList.add('active');
+                moonBtn.classList.remove('active');
+            } else {
+                moonBtn.classList.add('active');
+                sunBtn.classList.remove('active');
+            }
+
+            console.log("Aktueller Modus:", currentMode);
+        }
+
+        sunBtn.addEventListener('click', () => toggleTheme('light'));
+        moonBtn.addEventListener('click', () => toggleTheme('dark'));
+
+        // Direkte Shortcut-Logik in der index.html
+        window.addEventListener('keydown', function(e) {
+            // 1. Prüfen, ob STRG (oder CMD beim Mac) gedrückt ist
+            const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+            
+            // Wir reagieren auf 1, 2, 3, 4 nur, wenn STRG/CMD dabei ist
+            if (isCmdOrCtrl && ['1', '2', '3', '4'].includes(e.key)) {
+                
+                // STOPPT den Browser-Standard (z.B. Tab-Wechsel)
+                e.preventDefault(); 
+
+                // Die Downloads ausführen (funktioniert jetzt überall auf der Seite)
+                switch (e.key) {
+                    case '1': downloadPNG(); break;
+                    case '2': downloadSVG(); break;
+                    case '3': downloadJPG(); break;
+                    case '4': downloadBase64(); break;
+                }
+            }
+
+            // 2. Escape-Logik (nur wenn das Modal offen ist)
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('export-modal');
+                if (modal && getComputedStyle(modal).display !== 'none') {
+                    e.preventDefault();
+                    modal.classList.add('fade-out');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        modal.classList.remove('fade-out');
+                    }, 300);
+                }
             }
         });
     </script>
