@@ -29,28 +29,20 @@ python3 -m http.server 8080
 
 Then open: `http://localhost:8080`
 
-## Project Structure
+<details>
+    <summary>Project Structure</summary>
 
-```text
-.
-├── index.html          # Main page and UI logic
-├── src/
-│   ├── export.js       # Export functions (PNG/SVG/JPG/Base64)
-│   ├── modal.css       # Export modal styling
-│   ├── slider.css      # Slider styling
-│   └── themes.json     # Theme definitions
-└── LICENSE
-```
-
-## Contributing / Screenshots
-
-Absolutely! If you have additional screenshots or GIFs, feel free to share them in an issue or pull request.
-
-Helpful context:
-
-- Device/browser (e.g., Chrome 124, iOS Safari)
-- A short note about what should be shown
-- Optional: where it should appear in the README
+    ```
+    .
+    ├── index.html          # Main page and UI logic
+    ├── src/
+    │   ├── export.js       # Export functions (PNG/SVG/JPG/Base64)
+    │   ├── modal.css       # Export modal styling
+    │   ├── slider.css      # Slider styling
+    │   └── themes.json     # Theme definitions
+    └── LICENSE
+    ```
+</details>
 
 ## Demo
 
