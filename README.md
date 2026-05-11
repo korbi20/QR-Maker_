@@ -1,4 +1,4 @@
-<img src=".github/assets/QR-Maker_IntroGif.gif" style="border-radius: 20px;">
+<img src=".github/assets/QR-Maker_Intro.gif" style="border-radius: 20px;">
 
 #### QR-Maker_ a minimalist, local-first QR generator.
 
