@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR-Maker_</title>
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <link rel="stylesheet" href="src/slider.css">
+    <link rel="stylesheet" href="src/modal.css">
+    <script src="src/export.js"></script>
     <style>
         :root {
-            --gunmetal: #323437;
-            --saffron: #e2b714;
-            --dust-grey: #d1d0c5;
-            --dim-grey: #646669;
+            --bg: #323437;
+            --main: #e2b714;
+            --caret: #e2b714;
+            --sub: #646669;
+            --subAlt: #2c2e31;
+            --text: #d1d0c5;
+            --error: #ca4754;
         }
 
         * {
@@ -19,8 +25,8 @@
         }
 
         body {
-            background-color: var(--gunmetal);
-            color: var(--dust-grey);
+            background-color: var(--bg);
+            color: var(--text);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
             height: 100vh;
@@ -30,26 +36,7 @@
             padding: 55px 80px;
             -webkit-user-select: none;
             user-select: none;
-            
-        }
-
-        header h1 {
-            font-size: 0.85rem;
-            color: var(--dust-grey);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-weight: 800;
-            margin: 0;
-        }
-        
-        .accent-color {
-            color: var(--saffron);
-            display: inline-block;
-            width: 8.5px;
-            height: 3.05px;
-            background-color: var(--saffron);
-            margin-left: 2px;
-            vertical-align: baseline;
+            transition: all 0.25s ease;
         }
 
         main {
@@ -59,6 +46,25 @@
             justify-content: center;
             width: 100%;
             overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 0.85rem;
+            color: var(--text);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin: 0;
+        }
+        
+        .accent {
+            color: var(--main);
+            display: inline-block;
+            width: 8.5px;
+            height: 3.05px;
+            background-color: var(--main);
+            margin-left: 2px;
+            vertical-align: baseline;
         }
 
         .input-side {
@@ -96,14 +102,14 @@
         #typing-text {
             white-space: pre;
             pointer-events: none;
-            color: var(--dim-grey);
+            color: var(--sub);
         }
 
         .cursor {
             display: inline-block;
-            width: 3px;
+            width: 4px;
             height: 4.5rem;
-            background-color: var(--saffron);
+            background-color: var(--main);
             margin: 0 2px;
             vertical-align: middle;
             animation: blink 1s step-end infinite;
@@ -137,7 +143,7 @@
         .corners {
             position: absolute;
             inset: 0;
-            border: 5px solid var(--saffron);
+            border: 5px solid var(--main);
             border-radius: 30px;
             -webkit-mask-image: 
                 linear-gradient(black, black), linear-gradient(black, black),
@@ -152,7 +158,7 @@
         .qr-icon {
             width: 200px;
             height: 200px;
-            fill: var(--dim-grey);
+            fill: var(--sub);
             opacity: 0.2;
         }
 
@@ -170,12 +176,14 @@
             opacity: 1;
         }
 
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         footer {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 15px;
-            color: var(--dim-grey);
+            color: var(--sub);
             font-size: 0.75rem;
             letter-spacing: 1px;
             padding-bottom: 30px;
@@ -189,22 +197,29 @@
         .footer-icon {
             width: 20px;
             height: 20px;
-            fill: var(--dim-grey);
-            transition: fill 0.3s ease, transform 0.2s ease;
+            transition: color 0.3s ease, transform 0.2s ease;
         }
 
         .footer-icon:hover {
-            fill: var(--saffron);
-            transform: translateY(-2px);
+            color: var(--main);
             cursor: pointer;
         }
 
+        #theme-name {
+            font-size: 0.75rem;
+            color: var(--sub);
+            margin-left: -10px;
+        }
+
+        #version-display {
+            margin-left: -5px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>QR-Maker<span class="accent-color"></span></h1>
+        <h1>QR-Maker<span class="accent"></span></h1>
     </header>
 
     <main>
@@ -217,7 +232,7 @@
         </div>
 
         <div class="qr-side">
-            <div class="qr-wrapper" id="qr-display" title="click to download">
+            <div class="qr-wrapper" id="qr-display" title="click to copy">
                 <div class="corners"></div>
                 <svg id="placeholder-icon" class="qr-icon" viewBox="0 0 24 24">
                     <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 0h2v2h-2v-2z"/>
@@ -227,9 +242,58 @@
     </main>
 
     <footer>
-        <a href="https://github.com/korbi20/QR-Maker_" target="_blank" style="color: var(--dim-grey); cursor: pointer; display: inline-block; transition: color 0.3s;" onmouseover="this.style.color='var(--saffron)'" onmouseout="this.style.color='var(--dim-grey)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+        <svg id="theme-toggle" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-swatch-book-icon lucide-swatch-book" span="Theme switch"><title>Theme switch</title><path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z"/><path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7"/><path d="M 7 17h.01"/><path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8"/></svg>
+        <div id="theme-name">Loading...</div>
+        <svg id="export-trigger" class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-up-icon lucide-file-up"><title>Export menu</title><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/></svg>
+        <a href="https://github.com/korbi20/QR-Maker_" target="_blank" style="color: var(--sub); cursor: pointer; display: inline-block; transition: color 0.3s;" onmouseover="this.style.color='var(--main)'" onmouseout="this.style.color='var(--sub)'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;"><title>Github</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
         <span><span id="version-display">v1.0.0</span>
     </footer>
+
+    <div id="export-modal">
+        <div class="modal-content">
+
+            <div class="modal-header">
+            EXPORT OPTIONS
+            </div>
+
+            <div class="modal-grid">
+
+            <div class="modal-left">
+                <div class="export-item" onclick="downloadPNG()">PNG <span class="shortcut-hint">1</span></div>
+                <div class="export-item" onclick="downloadSVG()">SVG <span class="shortcut-hint">2</span></div>
+                <div class="export-item" onclick="downloadJPG()">JPG <span class="shortcut-hint">3</span></div>
+            </div>
+
+            <div class="modal-right">
+                <div class="export-item" onclick="downloadBase64()">Base64 (Clipboard) <span class="shortcut-hint">4</span></div>
+                <div class="size-export">
+                    <label>Size:</label>
+
+                    <div class="slider-row">
+                        <input type="range" id="size-slider" min="100" max="1000" value="200">
+                        <span class="slider-value" id="size-value">200</span>
+                    </div>
+                </div>
+                <div class="options-export">
+                    <div class="light-dark-export">
+                        <svg id="sun-btn" class="active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        <svg id="moon-btn" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+                    </div>
+                    <div class="btn-back">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+                        <p class="btn-back-cn"> Back</p>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <div class="modal-footer">
+                // &nbsp;&nbsp; Ctrl/Cmd + 1-4 for quick export
+            </div>
+
+        </div>
+    </div>
 
     <script>
         const hiddenInput = document.getElementById('hidden-input');
@@ -242,7 +306,10 @@
         let isFirstKey = true;
         let qrObj = null;
         let count = 0;
+        let currentQRValue = '';
 
+
+        // Input function
         function type() {
             if (i < phrase.length) {
                 textDisplay.textContent += phrase.charAt(i);
@@ -261,37 +328,51 @@
         hiddenInput.addEventListener('input', function() {
             let val = this.value;
             if (val.length === 0) {
-                textDisplay.style.color = "var(--dim-grey)";
+                textDisplay.style.color = "var(--sub)";
                 textDisplay.textContent = phrase;
                 isFirstKey = true;
             } else {
                 if (isFirstKey) {
-                    textDisplay.style.color = "var(--dust-grey)";
+                    textDisplay.style.color = "var(--text)";
                     isFirstKey = false;
                 }
                 textDisplay.textContent = val;
             }
         });
 
+        
+        // QR-Code generate
         hiddenInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const val = this.value.trim();
                 if (val.length > 0) {
                     placeholderIcon.style.display = 'none';
-                    
+                    currentQRValue = val;
+
+                    // CSS-Variable read for dynamic color and size
+                    const textColor = getComputedStyle(document.documentElement)
+                        .getPropertyValue('--text').trim();
+                    const qrSize = parseInt(getComputedStyle(document.documentElement)
+                        .getPropertyValue('--qr-size').trim(), 10);
+
+
                     if (!qrObj) {
                         const canvas = document.createElement('canvas');
                         qrWrapper.appendChild(canvas);
                         qrObj = new QRious({
                             element: canvas,
-                            size: 250,
+                            size: qrSize || 200,
                             value: val,
                             level: 'H',
                             background: 'transparent',
-                            foreground: '#d1d0c5'
+                            foreground: textColor || 'black'
                         });
                     } else {
-                        qrObj.value = val;
+                        // If QR already exists, just update the value and color (size is handled by slider)
+                        qrObj.set({
+                            foreground: textColor,
+                            value: val
+                        });
                     }
 
                     setTimeout(() => {
@@ -304,15 +385,42 @@
             }
         });
 
-        qrWrapper.onclick = () => {
+
+        // QR-Code rendering
+        function rebuildQR(size) {
+            const textColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--text').trim();
+
+            const canvas = qrWrapper.querySelector('canvas');
+            if (!currentQRValue) return;
+
+            if (!canvas) return;
+
+            qrObj.set({
+                value: currentQRValue,
+                size: size,
+                foreground: textColor
+            });
+        }
+
+
+        // QR-Code Shortcut
+        qrWrapper.onclick = async () => {
             const canvas = qrWrapper.querySelector('canvas');
             if (canvas) {
-                const link = document.createElement('a');
-                link.download = `qr-maker_${count}.png`; 
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                canvas.toBlob(blob => {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]);
+                    // Visuall feedback on click
+                    qrWrapper.style.transform = "scale(1.1)";
+                    setTimeout(() => qrWrapper.style.transform = "scale(1)", 200);
+                    console.log("Copied to clipboard!");
+                });
             }
         };
+
+
+        // Version function
         async function updateVersion() {
             const versionElement = document.getElementById('version-display');
             if (!versionElement) return;
@@ -328,6 +436,201 @@
         }
         window.addEventListener('load', updateVersion);
 
+
+        // Theme-Management
+        let themes = [];
+        let currentThemeIndex = 0;
+
+        async function initThemes() {
+            try {
+                const response = await fetch('src/themes.json');
+                themes = await response.json();
+                
+                // Last used theme index from localStorage, default to 0 if not set
+                currentThemeIndex = parseInt(localStorage.getItem('themeIndex')) || 0;
+                
+                applyTheme(currentThemeIndex);
+            } catch (error) {
+                console.error("Fehler beim Laden der themes.json:", error);
+            }
+        }
+
+        function applyTheme(index) {
+            const theme = themes[index];
+            if (!theme) return;
+
+            // All theme properties (except name) are set as CSS variables
+            Object.keys(theme).forEach(key => {
+                if (key !== 'name') {
+                    document.documentElement.style.setProperty(`--${key}`, theme[key]);
+                }
+            });
+
+            // Show current theme name
+            const nameDisplay = document.getElementById('theme-name');
+            if (nameDisplay) nameDisplay.innerText = theme.name;
+
+            // Saving current theme index in localStorage
+            localStorage.setItem('themeIndex', index);
+        }
+
+        document.getElementById('theme-toggle').onclick = () => {
+            if (themes.length === 0) return;
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            applyTheme(currentThemeIndex);
+            rebuildQR(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--qr-size').trim(), 10));
+        };
+        // Start
+        initThemes();
+
+
+        // Slider function
+        const slider = document.getElementById("size-slider");
+        const valueEl = document.getElementById("size-value");
+
+        const snapPoints = [100, 200, 236, 354, 400, 500, 591, 600, 1000]; // gängige QR-Code Größen (100-2000px)
+        const SNAP_RANGE = 7; // the smaller, the more precise the snapping (in pixels)
+
+        function nearestSnap(val) {
+            let closest = val;
+            let distMin = Infinity;
+
+            for (const p of snapPoints) {
+                const d = Math.abs(p - val);
+                if (d < distMin) {
+                    distMin = d;
+                    closest = p;
+                }
+            }
+
+            return distMin <= SNAP_RANGE ? closest : val;
+        }
+
+        function render(val) {
+            const min = +slider.min;
+            const max = +slider.max;
+
+            const percent = ((val - min) / (max - min)) * 100;
+
+            // Value
+            valueEl.textContent = val;
+
+            document.documentElement.style.setProperty('--qr-size', `${val}px`);
+
+            // Fill
+            slider.style.background = `
+                linear-gradient(
+                    to right,
+                    var(--main) 0%,
+                    var(--main) ${percent}%,
+                    var(--subAlt) ${percent}%,
+                    var(--subAlt) 100%
+                )
+            `;
+            rebuildQR(val);
+        }
+        function onInput(e) {
+            let val = +e.target.value;
+
+            val = nearestSnap(val);
+
+            slider.value = val;
+            render(val);
+        }
+        slider.addEventListener("input", onInput);
+        // init
+        render(+slider.value);
+
+
+        // Waiting for DOM to load before adding event listener to Back button
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const backBtn = document.querySelector('.btn-back');
+            const modal = document.getElementById('export-modal');
+
+            if (backBtn && modal) {
+                backBtn.addEventListener('click', () => {
+                    // 1. CSS-Class add for fade-out animation
+                    modal.classList.add('fade-out');
+
+                    // 2. After Animation (z.B. 300ms) Display set "none"
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        modal.classList.remove('fade-out'); // Reset for next open
+                    }, 300);
+                });
+            } else {
+                console.error("Button oder Modal wurde nicht im DOM gefunden!");
+            }
+        });
+
+        // Light/Dark Mode Toggle at Export Modal
+        const sunBtn = document.getElementById('sun-btn');
+        const moonBtn = document.getElementById('moon-btn');
+
+        // Saving state ("light" oder "dark")
+        let currentMode = 'light'; 
+
+        function toggleTheme(mode) {
+            currentMode = mode;
+
+            // Class exchange
+            if (mode === 'light') {
+                sunBtn.classList.add('active');
+                moonBtn.classList.remove('active');
+            } else {
+                moonBtn.classList.add('active');
+                sunBtn.classList.remove('active');
+            }
+
+            console.log("Aktueller Modus:", currentMode);
+        }
+
+        sunBtn.addEventListener('click', () => toggleTheme('light'));
+        moonBtn.addEventListener('click', () => toggleTheme('dark'));
+
+        // Direkte Shortcut-Logik in der index.html
+        window.addEventListener('keydown', function(e) {
+            // 1. Prüfen, ob STRG (oder CMD beim Mac) gedrückt ist
+            const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+            
+            // Wir reagieren auf 1, 2, 3, 4 nur, wenn STRG/CMD dabei ist
+            if (isCmdOrCtrl && ['1', '2', '3', '4'].includes(e.key)) {
+                
+                // STOPPT den Browser-Standard (z.B. Tab-Wechsel)
+                e.preventDefault(); 
+
+                // Die Downloads ausführen (funktioniert jetzt überall auf der Seite)
+                switch (e.key) {
+                    case '1': downloadPNG(); break;
+                    case '2': downloadSVG(); break;
+                    case '3': downloadJPG(); break;
+                    case '4': downloadBase64(); break;
+                }
+            }
+
+            // 2. Escape-Logik (nur wenn das Modal offen ist)
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('export-modal');
+                if (modal && getComputedStyle(modal).display !== 'none') {
+                    e.preventDefault();
+                    modal.classList.add('fade-out');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        modal.classList.remove('fade-out');
+                    }, 300);
+                }
+            }
+        });
     </script>
+    <script type="module">
+        import { setupExport } from './src/export.js';
+
+        setupExport(
+            'export-trigger',
+            'export-modal',
+        );
+    </script>
+
 </body>
 </html>
