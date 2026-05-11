@@ -1,13 +1,61 @@
-<img src=".github/assets/QR-Maker_Preview.gif" style="border-radius: 20px;">
+# QR-Maker_
 
-&nbsp;
+A minimal and modern QR code generator focused on clean UX, theme switching, and fast export workflows.
 
-Minimalistic and modern QR code generator focused on clean UX, responsive interactions, and polished export workflows.
+![QR-Maker Preview](.github/assets/QR-Maker_Preview.gif)
 
-#### 01. Usage
+## Features
 
-1. Type your URL or text
-2. Press Enter to generate
-3. Click the QR code to download as PNG
+- Live text input with Enter-based QR generation.
+- Export as **PNG**, **SVG**, **JPG**, or **Base64 (Clipboard)**.
+- Size control slider with practical snap points.
+- Theme system via `src/themes.json` with `localStorage` persistence.
+- Keyboard shortcuts (`Ctrl/Cmd + 1..4`) for quick exports.
 
-#### Try it [out](https://korbi20.github.io/QR-Maker_/)!
+## Quick Start
+
+This project is fully static, so you can run it with any basic local web server.
+
+### Option A: Open directly
+
+1. Clone the repository.
+2. Open `index.html` in your browser.
+
+### Option B: Run a local server (recommended)
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open: `http://localhost:8080`
+
+## Project Structure
+
+```text
+.
+├── index.html          # Main page and UI logic
+├── src/
+│   ├── export.js       # Export functions (PNG/SVG/JPG/Base64)
+│   ├── modal.css       # Export modal styling
+│   ├── slider.css      # Slider styling
+│   └── themes.json     # Theme definitions
+└── LICENSE
+```
+
+## Contributing / Screenshots
+
+Absolutely! If you have additional screenshots or GIFs, feel free to share them in an issue or pull request.
+
+Helpful context:
+
+- Device/browser (e.g., Chrome 124, iOS Safari)
+- A short note about what should be shown
+- Optional: where it should appear in the README
+
+## Demo
+
+GitHub Pages: https://korbi20.github.io/QR-Maker_/
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
