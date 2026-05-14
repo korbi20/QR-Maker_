@@ -431,7 +431,7 @@
                     versionElement.textContent = data.tag_name;
                 }
             } catch (e) {
-                versionElement.textContent = 'v1.0.0';
+                versionElement.textContent = 'Loading...';
             }
         }
         window.addEventListener('load', updateVersion);
